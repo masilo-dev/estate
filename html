@@ -1,1 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vacation Rentals Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .property-card:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Vacation Rentals</h1>
+            <nav>
+                <a href="#home" class="px-4 hover:underline">Home</a>
+                <a href="#properties" class="px-4 hover:underline">Properties</a>
+                <a href="#contact" class="px-4 hover:underline">Contact</a>
+            </nav>
+        </div>
+    </header>
 
+    <!-- Hero Section -->
+    <section id="home" class="bg-cover bg-center h-96" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c')">
+        <div class="container mx-auto px-4 h-full flex items-center justify-center">
+            <div class="text-center text-white">
+                <h2 class="text-4xl font-bold mb-4">Find Your Perfect Vacation Home</h2>
+                <p class="text-lg mb-6">Explore our curated selection of rental properties for your next getaway.</p>
+                <a href="#properties" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600">Browse Rentals</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Properties Section -->
+    <section id="properties" class="py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Our Properties</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="property-list">
+                <!-- Property cards will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="bg-gray-200 py-12">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">Get in Touch</h2>
+            <p class="text-lg mb-6">Have questions? Contact us for more information.</p>
+            <button class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600" onclick="alert('Contact form coming soon!')">Contact Us</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-blue-600 text-white py-4">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 Vacation Rentals. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mock property data (simulating Airbnb listings)
+        const properties = [
+            {
+                id: 1,
+                name: "Cozy Beach Cottage",
+                image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
+                description: "Charming cottage steps from the beach, perfect for a relaxing getaway.",
+                price: 150
+            },
+            {
+                id: 2,
+                name: "Mountain View Cabin",
+                image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be",
+                description: "Rustic cabin with stunning mountain views, ideal for nature lovers.",
+                price: 200
+            },
+            {
+                id: 3,
+                name: "Urban Loft",
+                image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2",
+                description: "Modern loft in the heart of the city, close to all attractions.",
+                price: 180
+            }
+        ];
+
+        // Populate property cards
+        const propertyList = document.getElementById('property-list');
+        properties.forEach(property => {
+            const card = document.createElement('div');
+            card.className = 'property-card bg-white rounded-lg shadow-lg p-4';
+            card.innerHTML = `
+                <img src="${property.image}" alt="${property.name}" class="w-full h-48 object-cover rounded-t-lg">
+                <h3 class="text-xl font-semibold mt-4">${property.name}</h3>
+                <p class="text-gray-600 mt-2">${property.description}</p>
+                <p class="text-lg font-bold mt-2">$${property.price}/night</p>
+                <button class="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onclick="alert('Booking functionality coming soon!')">Book Now</button>
+            `;
+            propertyList.appendChild(card);
+        });
+    </script>
+</body>
+</html>
