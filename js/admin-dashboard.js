@@ -1,6 +1,17 @@
 // Admin Dashboard JavaScript
 // Syncs with authentication system and displays all system data
 
+// Helper function to escape HTML to prevent XSS
+function escapeHtml(unsafe) {
+    if (typeof unsafe !== 'string') return unsafe;
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 // Check authentication on page load
 document.addEventListener('DOMContentLoaded', function() {
     if (!authService.isAuthenticated()) {
@@ -102,9 +113,9 @@ function loadOverview() {
             const item = document.createElement('div');
             item.className = 'text-sm border-b pb-2';
             item.innerHTML = `
-                <p class="font-semibold">$${payment.amount} - ${payment.propertyName}</p>
-                <p class="text-gray-600">Card ending in ${payment.cardLast4}</p>
-                <p class="text-xs text-gray-500">${new Date(payment.createdAt).toLocaleDateString()}</p>
+                <p class="font-semibold">$${escapeHtml(payment.amount)} - ${escapeHtml(payment.propertyName)}</p>
+                <p class="text-gray-600">Card ending in ${escapeHtml(payment.cardLast4)}</p>
+                <p class="text-xs text-gray-500">${escapeHtml(new Date(payment.createdAt).toLocaleDateString())}</p>
             `;
             recentPayments.appendChild(item);
         });
@@ -166,16 +177,16 @@ function loadAllPayments() {
         card.innerHTML = `
             <div class="flex justify-between items-start">
                 <div>
-                    <h3 class="text-lg font-semibold">${payment.propertyName}</h3>
-                    <p class="text-gray-600">Payment ID: #${payment.id}</p>
-                    <p class="text-gray-600">Booking ID: #${payment.bookingId}</p>
-                    <p class="text-gray-600">Card: **** **** **** ${payment.cardLast4}</p>
-                    <p class="text-sm text-gray-500">Date: ${new Date(payment.createdAt).toLocaleDateString()}</p>
+                    <h3 class="text-lg font-semibold">${escapeHtml(payment.propertyName)}</h3>
+                    <p class="text-gray-600">Payment ID: #${escapeHtml(payment.id)}</p>
+                    <p class="text-gray-600">Booking ID: #${escapeHtml(payment.bookingId)}</p>
+                    <p class="text-gray-600">Card: **** **** **** ${escapeHtml(payment.cardLast4)}</p>
+                    <p class="text-sm text-gray-500">Date: ${escapeHtml(new Date(payment.createdAt).toLocaleDateString())}</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-xl font-bold text-green-600">$${payment.amount}</p>
+                    <p class="text-xl font-bold text-green-600">$${escapeHtml(payment.amount)}</p>
                     <span class="px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
-                        ${payment.status}
+                        ${escapeHtml(payment.status)}
                     </span>
                 </div>
             </div>
@@ -226,13 +237,13 @@ function loadUsers() {
         
         card.innerHTML = `
             <div>
-                <h3 class="text-lg font-semibold">${user.name}</h3>
-                <p class="text-gray-600">${user.email}</p>
-                <p class="text-sm text-gray-500">Joined: ${new Date(user.createdAt).toLocaleDateString()}</p>
+                <h3 class="text-lg font-semibold">${escapeHtml(user.name)}</h3>
+                <p class="text-gray-600">${escapeHtml(user.email)}</p>
+                <p class="text-sm text-gray-500">Joined: ${escapeHtml(new Date(user.createdAt).toLocaleDateString())}</p>
             </div>
             <div>
                 <span class="px-3 py-1 rounded-full text-sm bg-${roleColor}-100 text-${roleColor}-800">
-                    ${user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                    ${escapeHtml(user.role.charAt(0).toUpperCase() + user.role.slice(1))}
                 </span>
             </div>
         `;
