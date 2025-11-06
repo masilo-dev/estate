@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Estate Rentals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tab {
+            cursor: pointer;
+            padding: 1rem;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            border-bottom-color: #2563eb;
+            color: #2563eb;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .stat-card {
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-purple-600 text-white py-4 shadow-md">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Estate Rentals - Admin Dashboard</h1>
+            <div class="flex items-center gap-4">
+                <span id="dashboard-user-name" class="mr-4"></span>
+                <a href="index.html" class="bg-white text-purple-600 px-4 py-2 rounded hover:bg-gray-100">Home</a>
+                <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="stat-card bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-gray-500 text-sm font-semibold mb-2">Total Bookings</h3>
+                <p id="total-bookings" class="text-3xl font-bold text-blue-600">0</p>
+            </div>
+            <div class="stat-card bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-gray-500 text-sm font-semibold mb-2">Total Revenue</h3>
+                <p id="total-revenue" class="text-3xl font-bold text-green-600">$0</p>
+            </div>
+            <div class="stat-card bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-gray-500 text-sm font-semibold mb-2">Active Properties</h3>
+                <p id="total-properties" class="text-3xl font-bold text-purple-600">0</p>
+            </div>
+            <div class="stat-card bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-gray-500 text-sm font-semibold mb-2">Pending Payments</h3>
+                <p id="pending-payments" class="text-3xl font-bold text-yellow-600">0</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="flex border-b">
+                <div class="tab active" onclick="switchTab('overview')">Overview</div>
+                <div class="tab" onclick="switchTab('bookings')">All Bookings</div>
+                <div class="tab" onclick="switchTab('payments')">Payments</div>
+                <div class="tab" onclick="switchTab('properties')">Properties</div>
+                <div class="tab" onclick="switchTab('users')">Users</div>
+            </div>
+
+            <!-- Overview Tab -->
+            <div id="overview-tab" class="tab-content active p-6">
+                <h2 class="text-2xl font-bold mb-4">Dashboard Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="border rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-3">Recent Bookings</h3>
+                        <div id="recent-bookings" class="space-y-2">
+                            <!-- Recent bookings will be loaded here -->
+                        </div>
+                    </div>
+                    <div class="border rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-3">Recent Payments</h3>
+                        <div id="recent-payments" class="space-y-2">
+                            <!-- Recent payments will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bookings Tab -->
+            <div id="bookings-tab" class="tab-content p-6">
+                <h2 class="text-2xl font-bold mb-4">All Bookings</h2>
+                <div id="all-bookings-list" class="space-y-4">
+                    <!-- All bookings will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Payments Tab -->
+            <div id="payments-tab" class="tab-content p-6">
+                <h2 class="text-2xl font-bold mb-4">Payment Transactions</h2>
+                <div id="all-payments-list" class="space-y-4">
+                    <!-- All payments will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Properties Tab -->
+            <div id="properties-tab" class="tab-content p-6">
+                <h2 class="text-2xl font-bold mb-4">Manage Properties</h2>
+                <div id="properties-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Properties will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="users-tab" class="tab-content p-6">
+                <h2 class="text-2xl font-bold mb-4">Registered Users</h2>
+                <div id="users-list" class="space-y-4">
+                    <!-- Users will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/properties.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+</body>
+</html>

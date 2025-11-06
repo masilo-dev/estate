@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard - Estate Rentals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tab {
+            cursor: pointer;
+            padding: 1rem;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            border-bottom-color: #2563eb;
+            color: #2563eb;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white py-4 shadow-md">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Estate Rentals - Client Dashboard</h1>
+            <div class="flex items-center gap-4">
+                <span id="dashboard-user-name" class="mr-4"></span>
+                <a href="index.html" class="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100">Home</a>
+                <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Tabs -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="flex border-b">
+                <div class="tab active" onclick="switchTab('bookings')">My Bookings</div>
+                <div class="tab" onclick="switchTab('payments')">Payments</div>
+                <div class="tab" onclick="switchTab('profile')">Profile</div>
+            </div>
+
+            <!-- Bookings Tab -->
+            <div id="bookings-tab" class="tab-content active p-6">
+                <h2 class="text-2xl font-bold mb-4">My Bookings</h2>
+                <div id="bookings-list" class="space-y-4">
+                    <!-- Bookings will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Payments Tab -->
+            <div id="payments-tab" class="tab-content p-6">
+                <h2 class="text-2xl font-bold mb-4">Payment History</h2>
+                <div id="payments-list" class="space-y-4">
+                    <!-- Payments will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profile-tab" class="tab-content p-6">
+                <h2 class="text-2xl font-bold mb-4">My Profile</h2>
+                <div id="profile-info" class="max-w-md">
+                    <!-- Profile info will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color: #fefefe; margin: 10% auto; padding: 20px; border-radius: 10px; width: 90%; max-width: 500px;">
+            <h2 class="text-2xl font-bold mb-4">Complete Payment</h2>
+            <div id="payment-details" class="mb-4">
+                <!-- Payment details will be shown here -->
+            </div>
+            <form onsubmit="handlePayment(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Card Number</label>
+                    <input type="text" id="card-number" class="w-full px-4 py-2 border rounded" placeholder="4242 4242 4242 4242" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Expiry Date</label>
+                        <input type="text" id="card-expiry" class="w-full px-4 py-2 border rounded" placeholder="MM/YY" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">CVV</label>
+                        <input type="text" id="card-cvv" class="w-full px-4 py-2 border rounded" placeholder="123" required>
+                    </div>
+                </div>
+                <div class="flex justify-between">
+                    <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Pay Now</button>
+                    <button type="button" onclick="closePaymentModal()" class="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/properties.js"></script>
+    <script src="js/client-dashboard.js"></script>
+</body>
+</html>
