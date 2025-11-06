@@ -5,67 +5,302 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Dashboard - Estate Rentals</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .animate-slide-in {
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
         .tab {
             cursor: pointer;
-            padding: 1rem;
-            border-bottom: 2px solid transparent;
+            padding: 1rem 1.5rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
         }
+        
+        .tab:hover {
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+        
         .tab.active {
             border-bottom-color: #2563eb;
             color: #2563eb;
+            background-color: rgba(37, 99, 235, 0.05);
         }
+        
         .tab-content {
             display: none;
         }
+        
         .tab-content.active {
             display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .booking-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .booking-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .booking-card.pending {
+            border-left-color: #f59e0b;
+        }
+        
+        .booking-card.confirmed {
+            border-left-color: #10b981;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .payment-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            font-weight: bold;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+        }
+        
+        .modal {
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+            padding-bottom: 2rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #9ca3af;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
         }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
     <!-- Header -->
-    <header class="bg-blue-600 text-white py-4 shadow-md">
+    <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-6 shadow-xl">
         <div class="container mx-auto px-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Estate Rentals - Client Dashboard</h1>
             <div class="flex items-center gap-4">
-                <span id="dashboard-user-name" class="mr-4"></span>
-                <a href="index.html" class="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100">Home</a>
-                <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700">Logout</button>
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                    <i class="fas fa-home text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold">Estate Rentals</h1>
+                    <p class="text-sm text-blue-100">Client Dashboard</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex items-center gap-3 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span id="dashboard-user-name" class="font-medium"></span>
+                </div>
+                <a href="index.html" class="bg-white text-blue-600 px-5 py-2.5 rounded-full hover:bg-blue-50 transition-all font-medium shadow-lg hover:shadow-xl">
+                    <i class="fas fa-home mr-2"></i>Home
+                </a>
+                <button onclick="logout()" class="bg-red-500 text-white px-5 py-2.5 rounded-full hover:bg-red-600 transition-all font-medium shadow-lg hover:shadow-xl">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </button>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-8">
+        <!-- Welcome Banner -->
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-xl p-8 mb-8 text-white animate-slide-in">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold mb-2">Welcome back!</h2>
+                    <p class="text-blue-100">Manage your bookings and payments all in one place</p>
+                </div>
+                <div class="hidden md:block">
+                    <i class="fas fa-calendar-check text-6xl opacity-20"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="stat-card rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold uppercase tracking-wide opacity-90">Total Bookings</h3>
+                    <i class="fas fa-calendar-alt text-2xl opacity-50"></i>
+                </div>
+                <p id="total-bookings-count" class="text-4xl font-bold">0</p>
+                <p class="text-sm mt-2 opacity-75">All time bookings</p>
+            </div>
+            <div class="stat-card rounded-xl shadow-lg p-6 text-white" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold uppercase tracking-wide opacity-90">Total Spent</h3>
+                    <i class="fas fa-dollar-sign text-2xl opacity-50"></i>
+                </div>
+                <p id="total-spent" class="text-4xl font-bold">$0</p>
+                <p class="text-sm mt-2 opacity-75">Lifetime spending</p>
+            </div>
+            <div class="stat-card rounded-xl shadow-lg p-6 text-white" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold uppercase tracking-wide opacity-90">Pending</h3>
+                    <i class="fas fa-clock text-2xl opacity-50"></i>
+                </div>
+                <p id="pending-bookings-count" class="text-4xl font-bold">0</p>
+                <p class="text-sm mt-2 opacity-75">Awaiting payment</p>
+            </div>
+        </div>
+
         <!-- Tabs -->
-        <div class="bg-white rounded-lg shadow-md mb-6">
-            <div class="flex border-b">
-                <div class="tab active" onclick="switchTab('bookings')">My Bookings</div>
-                <div class="tab" onclick="switchTab('payments')">Payments</div>
-                <div class="tab" onclick="switchTab('profile')">Profile</div>
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="flex border-b border-gray-200">
+                <div class="tab active" onclick="switchTab('bookings')">
+                    <i class="fas fa-list mr-2"></i>My Bookings
+                </div>
+                <div class="tab" onclick="switchTab('payments')">
+                    <i class="fas fa-credit-card mr-2"></i>Payments
+                </div>
+                <div class="tab" onclick="switchTab('profile')">
+                    <i class="fas fa-user-circle mr-2"></i>Profile
+                </div>
             </div>
 
             <!-- Bookings Tab -->
-            <div id="bookings-tab" class="tab-content active p-6">
-                <h2 class="text-2xl font-bold mb-4">My Bookings</h2>
+            <div id="bookings-tab" class="tab-content active p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-list text-blue-600 mr-2"></i>My Bookings
+                    </h2>
+                    <a href="index.html#properties" class="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl font-medium">
+                        <i class="fas fa-plus mr-2"></i>New Booking
+                    </a>
+                </div>
                 <div id="bookings-list" class="space-y-4">
                     <!-- Bookings will be loaded here -->
                 </div>
             </div>
 
             <!-- Payments Tab -->
-            <div id="payments-tab" class="tab-content p-6">
-                <h2 class="text-2xl font-bold mb-4">Payment History</h2>
+            <div id="payments-tab" class="tab-content p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-receipt text-green-600 mr-2"></i>Payment History
+                    </h2>
+                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                        <i class="fas fa-shield-alt text-green-600"></i>
+                        <span>Secure payments</span>
+                    </div>
+                </div>
                 <div id="payments-list" class="space-y-4">
                     <!-- Payments will be loaded here -->
                 </div>
             </div>
 
             <!-- Profile Tab -->
-            <div id="profile-tab" class="tab-content p-6">
-                <h2 class="text-2xl font-bold mb-4">My Profile</h2>
-                <div id="profile-info" class="max-w-md">
+            <div id="profile-tab" class="tab-content p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-user-circle text-purple-600 mr-2"></i>My Profile
+                </h2>
+                <div id="profile-info" class="max-w-2xl mx-auto">
                     <!-- Profile info will be loaded here -->
                 </div>
             </div>
@@ -73,30 +308,51 @@
     </div>
 
     <!-- Payment Modal -->
-    <div id="paymentModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
-        <div class="modal-content" style="background-color: #fefefe; margin: 10% auto; padding: 20px; border-radius: 10px; width: 90%; max-width: 500px;">
-            <h2 class="text-2xl font-bold mb-4">Complete Payment</h2>
-            <div id="payment-details" class="mb-4">
+    <div id="paymentModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-content bg-white rounded-2xl m-auto mt-20 p-8 max-w-md">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">
+                    <i class="fas fa-lock text-green-600 mr-2"></i>Complete Payment
+                </h2>
+                <button onclick="closePaymentModal()" class="text-gray-400 hover:text-gray-600 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="payment-details" class="mb-6">
                 <!-- Payment details will be shown here -->
             </div>
             <form onsubmit="handlePayment(event)">
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Card Number</label>
-                    <input type="text" id="card-number" class="w-full px-4 py-2 border rounded" placeholder="4242 4242 4242 4242" required>
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <i class="fas fa-credit-card mr-2 text-blue-600"></i>Card Number
+                    </label>
+                    <input type="text" id="card-number" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all" placeholder="4242 4242 4242 4242" maxlength="19" required>
                 </div>
-                <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-2 gap-4 mb-6">
                     <div>
-                        <label class="block text-gray-700 mb-2">Expiry Date</label>
-                        <input type="text" id="card-expiry" class="w-full px-4 py-2 border rounded" placeholder="MM/YY" required>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-calendar mr-2 text-blue-600"></i>Expiry
+                        </label>
+                        <input type="text" id="card-expiry" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all" placeholder="MM/YY" maxlength="5" required>
                     </div>
                     <div>
-                        <label class="block text-gray-700 mb-2">CVV</label>
-                        <input type="text" id="card-cvv" class="w-full px-4 py-2 border rounded" placeholder="123" required>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-lock mr-2 text-blue-600"></i>CVV
+                        </label>
+                        <input type="text" id="card-cvv" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all" placeholder="123" maxlength="4" required>
                     </div>
                 </div>
-                <div class="flex justify-between">
-                    <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Pay Now</button>
-                    <button type="button" onclick="closePaymentModal()" class="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500">Cancel</button>
+                <div class="flex gap-3">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-4 rounded-xl hover:from-green-600 hover:to-green-700 transition-all font-semibold shadow-lg hover:shadow-xl">
+                        <i class="fas fa-check-circle mr-2"></i>Pay Now
+                    </button>
+                    <button type="button" onclick="closePaymentModal()" class="bg-gray-200 text-gray-700 px-6 py-4 rounded-xl hover:bg-gray-300 transition-all font-semibold">
+                        Cancel
+                    </button>
+                </div>
+                <div class="mt-4 text-center text-sm text-gray-500">
+                    <i class="fas fa-shield-alt text-green-600 mr-1"></i>
+                    Your payment information is secure and encrypted
                 </div>
             </form>
         </div>
