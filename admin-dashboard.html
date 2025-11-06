@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Estate Rentals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .animate-slide-in {
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .tab {
+            cursor: pointer;
+            padding: 1rem 1.5rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .tab:hover {
+            background-color: rgba(109, 40, 217, 0.05);
+        }
+        
+        .tab.active {
+            border-bottom-color: #7c3aed;
+            color: #7c3aed;
+            background-color: rgba(124, 58, 237, 0.05);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .stat-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .data-card {
+            transition: all 0.3s ease;
+        }
+        
+        .data-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 1rem 0;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #9ca3af;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-purple-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-6 shadow-xl">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                    <i class="fas fa-shield-alt text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold">Estate Rentals</h1>
+                    <p class="text-sm text-purple-100">Admin Dashboard</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex items-center gap-3 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <span id="dashboard-user-name" class="font-medium"></span>
+                </div>
+                <a href="index.html" class="bg-white text-purple-600 px-5 py-2.5 rounded-full hover:bg-purple-50 transition-all font-medium shadow-lg hover:shadow-xl">
+                    <i class="fas fa-home mr-2"></i>Home
+                </a>
+                <button onclick="logout()" class="bg-red-500 text-white px-5 py-2.5 rounded-full hover:bg-red-600 transition-all font-medium shadow-lg hover:shadow-xl">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Welcome Banner -->
+        <div class="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl shadow-xl p-8 mb-8 text-white animate-slide-in">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold mb-2">Admin Control Center</h2>
+                    <p class="text-purple-100">Manage your properties, bookings, and users from one place</p>
+                </div>
+                <div class="hidden md:block">
+                    <i class="fas fa-chart-line text-6xl opacity-20"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white" style="animation-delay: 0.1s;">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold uppercase tracking-wide opacity-90">Total Bookings</h3>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-calendar-check text-2xl"></i>
+                    </div>
+                </div>
+                <p id="total-bookings" class="text-4xl font-bold mb-2">0</p>
+                <p class="text-sm opacity-75">All time bookings</p>
+            </div>
+            <div class="stat-card bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white" style="animation-delay: 0.2s;">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold uppercase tracking-wide opacity-90">Total Revenue</h3>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-dollar-sign text-2xl"></i>
+                    </div>
+                </div>
+                <p id="total-revenue" class="text-4xl font-bold mb-2">$0</p>
+                <p class="text-sm opacity-75">Lifetime earnings</p>
+            </div>
+            <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white" style="animation-delay: 0.3s;">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold uppercase tracking-wide opacity-90">Active Properties</h3>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-building text-2xl"></i>
+                    </div>
+                </div>
+                <p id="total-properties" class="text-4xl font-bold mb-2">0</p>
+                <p class="text-sm opacity-75">Listed properties</p>
+            </div>
+            <div class="stat-card bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl shadow-lg p-6 text-white" style="animation-delay: 0.4s;">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold uppercase tracking-wide opacity-90">Pending Payments</h3>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-clock text-2xl"></i>
+                    </div>
+                </div>
+                <p id="pending-payments" class="text-4xl font-bold mb-2">0</p>
+                <p class="text-sm opacity-75">Awaiting payment</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="flex border-b border-gray-200 overflow-x-auto">
+                <div class="tab active" onclick="switchTab('overview')">
+                    <i class="fas fa-chart-pie mr-2"></i>Overview
+                </div>
+                <div class="tab" onclick="switchTab('bookings')">
+                    <i class="fas fa-list mr-2"></i>All Bookings
+                </div>
+                <div class="tab" onclick="switchTab('payments')">
+                    <i class="fas fa-credit-card mr-2"></i>Payments
+                </div>
+                <div class="tab" onclick="switchTab('properties')">
+                    <i class="fas fa-building mr-2"></i>Properties
+                </div>
+                <div class="tab" onclick="switchTab('users')">
+                    <i class="fas fa-users mr-2"></i>Users
+                </div>
+            </div>
+
+            <!-- Overview Tab -->
+            <div id="overview-tab" class="tab-content active p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-chart-line text-purple-600 mr-2"></i>Dashboard Overview
+                    </h2>
+                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Live Data</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-100 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">
+                            <i class="fas fa-calendar-check text-blue-600 mr-2"></i>Recent Bookings
+                        </h3>
+                        <div id="recent-bookings" class="space-y-3">
+                            <!-- Recent bookings will be loaded here -->
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-100 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">
+                            <i class="fas fa-dollar-sign text-green-600 mr-2"></i>Recent Payments
+                        </h3>
+                        <div id="recent-payments" class="space-y-3">
+                            <!-- Recent payments will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bookings Tab -->
+            <div id="bookings-tab" class="tab-content p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-list-alt text-blue-600 mr-2"></i>All Bookings
+                    </h2>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600">Total:</span>
+                        <span id="bookings-count" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold">0</span>
+                    </div>
+                </div>
+                <div id="all-bookings-list" class="space-y-4">
+                    <!-- All bookings will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Payments Tab -->
+            <div id="payments-tab" class="tab-content p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-money-check-alt text-green-600 mr-2"></i>Payment Transactions
+                    </h2>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600">Total:</span>
+                        <span id="payments-count" class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-bold">0</span>
+                    </div>
+                </div>
+                <div id="all-payments-list" class="space-y-4">
+                    <!-- All payments will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Properties Tab -->
+            <div id="properties-tab" class="tab-content p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-building text-purple-600 mr-2"></i>Manage Properties
+                    </h2>
+                    <button class="bg-purple-600 text-white px-6 py-3 rounded-full hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl font-medium">
+                        <i class="fas fa-plus mr-2"></i>Add Property
+                    </button>
+                </div>
+                <div id="properties-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Properties will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="users-tab" class="tab-content p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-users text-indigo-600 mr-2"></i>Registered Users
+                    </h2>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600">Total:</span>
+                        <span id="users-count" class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full font-bold">0</span>
+                    </div>
+                </div>
+                <div id="users-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Users will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/properties.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+</body>
+</html>
