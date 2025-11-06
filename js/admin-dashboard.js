@@ -28,15 +28,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Set user name in header
-    document.getElementById('dashboard-user-name').textContent = `Welcome, ${user.name}`;
+    document.getElementById('dashboard-user-name').textContent = user.name;
 
-    // Load dashboard data
+    // Load dashboard data with counts
     loadStats();
     loadOverview();
     loadAllBookings();
     loadAllPayments();
     loadProperties();
     loadUsers();
+    
+    // Update counts
+    updateCounts();
 });
 
 // Listen for auth state changes
@@ -58,6 +61,16 @@ function switchTab(tabName) {
     // Add active class to selected tab
     event.target.classList.add('active');
     document.getElementById(`${tabName}-tab`).classList.add('active');
+}
+
+function updateCounts() {
+    const bookings = getBookings();
+    const payments = getPayments();
+    const users = authService.getUsers();
+    
+    document.getElementById('bookings-count').textContent = bookings.length;
+    document.getElementById('payments-count').textContent = payments.length;
+    document.getElementById('users-count').textContent = users.length;
 }
 
 function loadStats() {
@@ -86,16 +99,34 @@ function loadOverview() {
     const recentBookings = document.getElementById('recent-bookings');
 
     if (bookings.length === 0) {
-        recentBookings.innerHTML = '<p class="text-gray-500 text-sm">No bookings yet</p>';
+        recentBookings.innerHTML = `
+            <div class="text-center py-8 text-gray-400">
+                <i class="fas fa-inbox text-4xl mb-2 opacity-30"></i>
+                <p class="text-sm">No recent bookings</p>
+            </div>
+        `;
     } else {
         recentBookings.innerHTML = '';
-        bookings.forEach(booking => {
+        bookings.forEach((booking, index) => {
             const item = document.createElement('div');
-            item.className = 'text-sm border-b pb-2';
+            item.className = 'flex items-center gap-3 p-3 bg-white rounded-lg hover:shadow-md transition-all';
+            item.style.animationDelay = `${index * 0.05}s`;
+            item.classList.add('animate-slide-in');
+            
+            const statusIcon = booking.status === 'confirmed' ? 'check-circle' : 'clock';
+            const statusColor = booking.status === 'confirmed' ? 'green' : 'yellow';
+            
             item.innerHTML = `
-                <p class="font-semibold">${escapeHtml(booking.propertyName)}</p>
-                <p class="text-gray-600">${escapeHtml(booking.userName)} - $${escapeHtml(booking.price)}</p>
-                <p class="text-xs text-gray-500">${escapeHtml(new Date(booking.createdAt).toLocaleDateString())}</p>
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-home text-blue-600"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-gray-800 truncate">${escapeHtml(booking.propertyName)}</p>
+                    <p class="text-xs text-gray-500">${escapeHtml(booking.userName)} • $${escapeHtml(booking.price)}</p>
+                </div>
+                <div class="flex-shrink-0">
+                    <i class="fas fa-${statusIcon} text-${statusColor}-600"></i>
+                </div>
             `;
             recentBookings.appendChild(item);
         });
@@ -106,16 +137,30 @@ function loadOverview() {
     const recentPayments = document.getElementById('recent-payments');
 
     if (payments.length === 0) {
-        recentPayments.innerHTML = '<p class="text-gray-500 text-sm">No payments yet</p>';
+        recentPayments.innerHTML = `
+            <div class="text-center py-8 text-gray-400">
+                <i class="fas fa-wallet text-4xl mb-2 opacity-30"></i>
+                <p class="text-sm">No recent payments</p>
+            </div>
+        `;
     } else {
         recentPayments.innerHTML = '';
-        payments.forEach(payment => {
+        payments.forEach((payment, index) => {
             const item = document.createElement('div');
-            item.className = 'text-sm border-b pb-2';
+            item.className = 'flex items-center gap-3 p-3 bg-white rounded-lg hover:shadow-md transition-all';
+            item.style.animationDelay = `${index * 0.05}s`;
+            item.classList.add('animate-slide-in');
             item.innerHTML = `
-                <p class="font-semibold">$${escapeHtml(payment.amount)} - ${escapeHtml(payment.propertyName)}</p>
-                <p class="text-gray-600">Card ending in ${escapeHtml(payment.cardLast4)}</p>
-                <p class="text-xs text-gray-500">${escapeHtml(new Date(payment.createdAt).toLocaleDateString())}</p>
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-dollar-sign text-green-600"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-gray-800 truncate">${escapeHtml(payment.propertyName)}</p>
+                    <p class="text-xs text-gray-500">•••• ${escapeHtml(payment.cardLast4 || '****')}</p>
+                </div>
+                <div class="flex-shrink-0">
+                    <p class="font-bold text-green-600">$${escapeHtml(payment.amount)}</p>
+                </div>
             `;
             recentPayments.appendChild(item);
         });
