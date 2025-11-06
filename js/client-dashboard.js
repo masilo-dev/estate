@@ -80,14 +80,14 @@ function loadBookings() {
         card.innerHTML = `
             <div class="flex justify-between items-start">
                 <div>
-                    <h3 class="text-lg font-semibold">${booking.propertyName}</h3>
-                    <p class="text-gray-600">Booking ID: #${booking.id}</p>
-                    <p class="text-gray-600">Amount: $${booking.price}</p>
-                    <p class="text-sm text-gray-500">Created: ${new Date(booking.createdAt).toLocaleDateString()}</p>
+                    <h3 class="text-lg font-semibold">${escapeHtml(booking.propertyName)}</h3>
+                    <p class="text-gray-600">Booking ID: #${escapeHtml(booking.id)}</p>
+                    <p class="text-gray-600">Amount: $${escapeHtml(booking.price)}</p>
+                    <p class="text-sm text-gray-500">Created: ${escapeHtml(new Date(booking.createdAt).toLocaleDateString())}</p>
                 </div>
                 <div class="text-right">
                     <span class="px-3 py-1 rounded-full text-sm bg-${statusColor}-100 text-${statusColor}-800">
-                        ${booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                        ${escapeHtml(booking.status.charAt(0).toUpperCase() + booking.status.slice(1))}
                     </span>
                     ${booking.status === 'pending' ? 
                         `<button onclick="showPaymentModal(${booking.id})" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 block">Pay Now</button>` : 
@@ -142,11 +142,11 @@ function loadProfile() {
         <div class="space-y-4">
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Full Name</label>
-                <p class="px-4 py-2 bg-gray-50 border rounded">${user.name}</p>
+                <p class="px-4 py-2 bg-gray-50 border rounded">${escapeHtml(user.name)}</p>
             </div>
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Email</label>
-                <p class="px-4 py-2 bg-gray-50 border rounded">${user.email}</p>
+                <p class="px-4 py-2 bg-gray-50 border rounded">${escapeHtml(user.email)}</p>
             </div>
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">User Type</label>
@@ -173,9 +173,9 @@ function showPaymentModal(bookingId) {
     const paymentDetails = document.getElementById('payment-details');
     paymentDetails.innerHTML = `
         <div class="bg-blue-50 p-4 rounded-lg mb-4">
-            <h3 class="font-semibold text-lg">${booking.propertyName}</h3>
-            <p class="text-gray-600">Booking ID: #${booking.id}</p>
-            <p class="text-2xl font-bold text-blue-600 mt-2">Total: $${booking.price}</p>
+            <h3 class="font-semibold text-lg">${escapeHtml(booking.propertyName)}</h3>
+            <p class="text-gray-600">Booking ID: #${escapeHtml(booking.id)}</p>
+            <p class="text-2xl font-bold text-blue-600 mt-2">Total: $${escapeHtml(booking.price)}</p>
         </div>
     `;
 

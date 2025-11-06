@@ -1,4 +1,16 @@
 // Properties data and management
+
+// Helper function to escape HTML to prevent XSS
+function escapeHtml(unsafe) {
+    if (typeof unsafe !== 'string') return unsafe;
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 const properties = [
     {
         id: 1,
@@ -66,11 +78,11 @@ function loadProperties() {
         const card = document.createElement('div');
         card.className = 'property-card bg-white rounded-lg shadow-lg p-4';
         card.innerHTML = `
-            <img src="${property.image}" alt="${property.name}" class="w-full h-48 object-cover rounded-t-lg">
-            <h3 class="text-xl font-semibold mt-4">${property.name}</h3>
-            <p class="text-sm text-gray-500 mt-1">${property.location}</p>
-            <p class="text-gray-600 mt-2">${property.description}</p>
-            <p class="text-lg font-bold mt-2 text-blue-600">$${property.price}/night</p>
+            <img src="${escapeHtml(property.image)}" alt="${escapeHtml(property.name)}" class="w-full h-48 object-cover rounded-t-lg">
+            <h3 class="text-xl font-semibold mt-4">${escapeHtml(property.name)}</h3>
+            <p class="text-sm text-gray-500 mt-1">${escapeHtml(property.location)}</p>
+            <p class="text-gray-600 mt-2">${escapeHtml(property.description)}</p>
+            <p class="text-lg font-bold mt-2 text-blue-600">$${escapeHtml(property.price)}/night</p>
             <button class="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" 
                     onclick="bookProperty(${property.id})">Book Now</button>
         `;

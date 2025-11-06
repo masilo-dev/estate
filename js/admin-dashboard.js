@@ -93,9 +93,9 @@ function loadOverview() {
             const item = document.createElement('div');
             item.className = 'text-sm border-b pb-2';
             item.innerHTML = `
-                <p class="font-semibold">${booking.propertyName}</p>
-                <p class="text-gray-600">${booking.userName} - $${booking.price}</p>
-                <p class="text-xs text-gray-500">${new Date(booking.createdAt).toLocaleDateString()}</p>
+                <p class="font-semibold">${escapeHtml(booking.propertyName)}</p>
+                <p class="text-gray-600">${escapeHtml(booking.userName)} - $${escapeHtml(booking.price)}</p>
+                <p class="text-xs text-gray-500">${escapeHtml(new Date(booking.createdAt).toLocaleDateString())}</p>
             `;
             recentBookings.appendChild(item);
         });
@@ -142,16 +142,16 @@ function loadAllBookings() {
         card.innerHTML = `
             <div class="flex justify-between items-start">
                 <div>
-                    <h3 class="text-lg font-semibold">${booking.propertyName}</h3>
-                    <p class="text-gray-600">Booking ID: #${booking.id}</p>
-                    <p class="text-gray-600">Customer: ${booking.userName} (${booking.userEmail})</p>
-                    <p class="text-gray-600">Amount: $${booking.price}</p>
-                    <p class="text-sm text-gray-500">Created: ${new Date(booking.createdAt).toLocaleDateString()}</p>
-                    ${booking.paidAt ? `<p class="text-sm text-gray-500">Paid: ${new Date(booking.paidAt).toLocaleDateString()}</p>` : ''}
+                    <h3 class="text-lg font-semibold">${escapeHtml(booking.propertyName)}</h3>
+                    <p class="text-gray-600">Booking ID: #${escapeHtml(booking.id)}</p>
+                    <p class="text-gray-600">Customer: ${escapeHtml(booking.userName)} (${escapeHtml(booking.userEmail)})</p>
+                    <p class="text-gray-600">Amount: $${escapeHtml(booking.price)}</p>
+                    <p class="text-sm text-gray-500">Created: ${escapeHtml(new Date(booking.createdAt).toLocaleDateString())}</p>
+                    ${booking.paidAt ? `<p class="text-sm text-gray-500">Paid: ${escapeHtml(new Date(booking.paidAt).toLocaleDateString())}</p>` : ''}
                 </div>
                 <div>
                     <span class="px-3 py-1 rounded-full text-sm bg-${statusColor}-100 text-${statusColor}-800">
-                        ${booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                        ${escapeHtml(booking.status.charAt(0).toUpperCase() + booking.status.slice(1))}
                     </span>
                 </div>
             </div>
@@ -205,11 +205,11 @@ function loadProperties() {
         card.className = 'border rounded-lg p-4 bg-white';
         
         card.innerHTML = `
-            <img src="${property.image}" alt="${property.name}" class="w-full h-32 object-cover rounded-lg mb-3">
-            <h3 class="font-semibold text-lg">${property.name}</h3>
-            <p class="text-sm text-gray-500">${property.location}</p>
-            <p class="text-gray-600 text-sm mt-2">${property.description}</p>
-            <p class="text-lg font-bold text-blue-600 mt-2">$${property.price}/night</p>
+            <img src="${escapeHtml(property.image)}" alt="${escapeHtml(property.name)}" class="w-full h-32 object-cover rounded-lg mb-3">
+            <h3 class="font-semibold text-lg">${escapeHtml(property.name)}</h3>
+            <p class="text-sm text-gray-500">${escapeHtml(property.location)}</p>
+            <p class="text-gray-600 text-sm mt-2">${escapeHtml(property.description)}</p>
+            <p class="text-lg font-bold text-blue-600 mt-2">$${escapeHtml(property.price)}/night</p>
             <div class="mt-3 flex gap-2">
                 <button class="flex-1 bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">Edit</button>
                 <button class="flex-1 bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">Disable</button>
